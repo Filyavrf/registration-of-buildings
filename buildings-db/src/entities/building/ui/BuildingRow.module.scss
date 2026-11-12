@@ -1,0 +1,78 @@
+.row {
+  border-bottom: 1px solid #e5e7eb;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: #f9fafb;
+  }
+}
+
+.cell {
+  padding: 0.75rem;
+}
+
+.cellMain {
+  padding: 0.75rem;
+  font-weight: 500;
+  color: #111827;
+}
+
+.cellCenter {
+  padding: 0.75rem;
+  text-align: center;
+}
+
+.cellRight {
+  padding: 0.75rem;
+  text-align: right;
+}
+
+.checkbox {
+  border-radius: 0.25rem;
+  border: 1px solid #d1d5db;
+  color: #2563eb;
+  cursor: pointer;
+}
+
+.badge {
+  display: inline-block;
+  padding: 0.125rem 0.625rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 9999px;
+  background-color: #dbeafe;
+  color: #1e40af;
+}
+
+.deleteBtn {
+  color: #dc2626;
+  font-weight: 500;
+  font-size: 0.875rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s;
+
+  &:hover {
+    color: #7f1d1d;
+    background-color: #fef2f2;
+  }
+}
+.editBtn {
+  color: #2563eb;
+  font-weight: 500;
+  font-size: 0.875rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s;
+
+  &:hover {
+    color: #1d4ed8;
+    background-color: #eff6ff;
+  }
+}

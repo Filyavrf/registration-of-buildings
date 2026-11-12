@@ -1,75 +1,18 @@
-# React + TypeScript + Vite
+# Курсовая работа по веб-программированию
+## React + TypeScript + Zustand + Zod + Vite + ScssModules 
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Задание:
+Выбрать предметную область для собственной базы данных и предложить структуру объектов для описания отдельных записей базы данных. Для выбранной базы данных написать следующие функции:
 
-Currently, two official plugins are available:
+1. Функцию формирования массива объектов, значения свойств которых вводятся с клавиатуры. При вводе объектов можно реализовать один из следующих механизмов:
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+    1.1 ввод заранее заданного количества объектов;
+    
+    1.2 ввод до появления объекта с заданным признаком;
 
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
-```
-
-You can also install [eslint-plugin-react-x](https://npmx.dev/package/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://npmx.dev/package/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
-```
+    1.3 диалог с пользователем о необходимости продолжать ввод.
+2. Функцию просмотра содержимого массива объектов.
+3. Функцию дополнения уже существующего массива новыми объектами.
+4. Функцию поиска и вывода на экран объекта (объектов) с заданным значением того или иного свойства.
+5. Функцию упорядочения массива структур по заданному тому или иному свойству.
+6. Функцию удаления одного или нескольких объектов из массива.
