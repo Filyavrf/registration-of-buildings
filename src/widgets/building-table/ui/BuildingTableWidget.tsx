@@ -2,12 +2,18 @@ import { useState } from 'react';
 import { useBuildingStore } from '../../../entities/building/model/store.ts';
 import { BuildingRow } from '../../../entities/building/ui/BuildingRow.tsx';
 import { BUILDING_TYPE_LABELS } from '../../../entities/building/lib/labels.ts';
+import { ConfirmDialog } from '../../../shared/ui/ConfirmDialog/ConfirmDialog.tsx';
 import type { Building, BuildingType, SortKey } from '../../../entities/building/model/types.ts';
 import styles from './BuildingTableWidget.module.scss';
 
 interface BuildingTableWidgetProps {
   onAddClick: () => void;
   onEditClick: (building: Building) => void;
+}
+
+interface PendingDelete {
+  ids: string[];
+  message: string;
 }
 
 export const BuildingTableWidget = ({ onAddClick, onEditClick }: BuildingTableWidgetProps) => {
@@ -20,12 +26,22 @@ export const BuildingTableWidget = ({ onAddClick, onEditClick }: BuildingTableWi
     setSortState,
     remove,
     removeMany,
-    seedMockData,
     getFilteredAndSortedItems,
   } = useBuildingStore();
 
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [pendingDelete, setPendingDelete] = useState<PendingDelete | null>(null);
   const items = getFilteredAndSortedItems();
+
+  const handleSearchChange = (value: string) => {
+    setSearchQuery(value);
+    setSelectedIds([]);
+  };
+
+  const handleFilterChange = (value: BuildingType | 'all') => {
+    setFilterType(value);
+    setSelectedIds([]);
+  };
 
   const handleToggleSelect = (id: string) => {
     setSelectedIds((prev) =>
@@ -51,9 +67,33 @@ export const BuildingTableWidget = ({ onAddClick, onEditClick }: BuildingTableWi
     }
   };
 
-  const handleRemoveSelected = () => {
-    removeMany(selectedIds);
-    setSelectedIds([]);
+  const requestDeleteOne = (id: string) => {
+    const building = items.find((b) => b.id === id);
+    setPendingDelete({
+      ids: [id],
+      message: `Удалить здание «${building?.address ?? ''}»?`,
+    });
+  };
+
+  const requestDeleteSelected = () => {
+    setPendingDelete({
+      ids: selectedIds,
+      message: `Удалить выбранные здания (${selectedIds.length})?`,
+    });
+  };
+
+  const confirmDelete = () => {
+    if (!pendingDelete) return;
+    const { ids } = pendingDelete;
+
+    if (ids.length === 1) {
+      remove(ids[0]);
+    } else {
+      removeMany(ids);
+    }
+
+    setSelectedIds((prev) => prev.filter((id) => !ids.includes(id)));
+    setPendingDelete(null);
   };
 
   return (
@@ -64,13 +104,13 @@ export const BuildingTableWidget = ({ onAddClick, onEditClick }: BuildingTableWi
             type="text"
             placeholder="Поиск по адресу..."
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={(e) => handleSearchChange(e.target.value)}
             className={styles.searchInput}
           />
 
           <select
             value={filterType}
-            onChange={(e) => setFilterType(e.target.value as BuildingType | 'all')}
+            onChange={(e) => handleFilterChange(e.target.value as BuildingType | 'all')}
             className={styles.selectFilter}
           >
             <option value="all">Все типы зданий</option>
@@ -84,14 +124,10 @@ export const BuildingTableWidget = ({ onAddClick, onEditClick }: BuildingTableWi
 
         <div className={styles.actions}>
           {selectedIds.length > 0 && (
-            <button onClick={handleRemoveSelected} className={styles.dangerBtn}>
+            <button onClick={requestDeleteSelected} className={styles.dangerBtn}>
               Удалить выбранные ({selectedIds.length})
             </button>
           )}
-
-          <button onClick={seedMockData} className={styles.secondaryBtn} title="Заполнить 50 случайными записями">
-            ⚡ Заполнить 50 записей
-          </button>
 
           <button onClick={onAddClick} className={styles.primaryBtn}>
             + Добавить здание
@@ -147,13 +183,20 @@ export const BuildingTableWidget = ({ onAddClick, onEditClick }: BuildingTableWi
                   isSelected={selectedIds.includes(building.id)}
                   onToggleSelect={handleToggleSelect}
                   onEdit={onEditClick}
-                  onDelete={remove}
+                  onDelete={requestDeleteOne}
                 />
               ))
             )}
           </tbody>
         </table>
       </div>
+
+      <ConfirmDialog
+        isOpen={pendingDelete !== null}
+        message={pendingDelete?.message ?? ''}
+        onConfirm={confirmDelete}
+        onCancel={() => setPendingDelete(null)}
+      />
     </div>
   );
 };

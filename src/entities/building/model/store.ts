@@ -1,6 +1,7 @@
 import { create } from 'zustand';
-import type { Building, BuildingDraft, SortState, BuildingType } from './types.ts';
+import type { Building, BuildingDraft, SortKey, SortState, BuildingType } from './types.ts';
 import { buildingRepository } from '../api/buildingRepository.ts';
+import { BUILDING_TYPE_LABELS } from '../lib/labels.ts';
 
 interface BuildingState {
   items: Building[];
@@ -18,9 +19,10 @@ interface BuildingState {
   setSortState: (sort: SortState | null) => void;
 
   getFilteredAndSortedItems: () => Building[];
-
-  seedMockData: () => void;
 }
+
+const getSortValue = (item: Building, key: SortKey): string | number =>
+  key === 'type' ? BUILDING_TYPE_LABELS[item.type] : item[key];
 
 export const useBuildingStore = create<BuildingState>()((set, get) => ({
   items: buildingRepository.getAll(),
@@ -74,13 +76,12 @@ export const useBuildingStore = create<BuildingState>()((set, get) => ({
     if (sortState) {
       const { key, dir } = sortState;
       result = [...result].sort((a, b) => {
-        const valA = a[key];
-        const valB = b[key];
+        const valA = getSortValue(a, key);
+        const valB = getSortValue(b, key);
 
         if (typeof valA === 'string' && typeof valB === 'string') {
-          return dir === 'asc'
-            ? valA.localeCompare(valB)
-            : valB.localeCompare(valA);
+          const cmp = valA.localeCompare(valB, 'ru');
+          return dir === 'asc' ? cmp : -cmp;
         }
 
         if (typeof valA === 'number' && typeof valB === 'number') {
@@ -92,38 +93,5 @@ export const useBuildingStore = create<BuildingState>()((set, get) => ({
     }
 
     return result;
-  },
-  seedMockData: () => {
-    const streets = [
-      'пр. Ленина',
-      'ул. Пушкина',
-      'пр. Фрунзе',
-      'ул. Советская',
-      'пр. Комсомольский',
-      'ул. Сибирская',
-      'ул. Киевская',
-      'ул. Красноармейская',
-    ];
-
-    const types: BuildingType[] = ['residential', 'office', 'industrial', 'public'];
-
-    const mockItems: Building[] = Array.from({ length: 50 }, (_, index) => {
-      const street = streets[Math.floor(Math.random() * streets.length)];
-      const type = types[Math.floor(Math.random() * types.length)];
-      const floors = Math.floor(Math.random() * 20) + 1;
-
-      return {
-        id: crypto.randomUUID(),
-        address: `${street}, д. ${index + 1}`,
-        type,
-        floors,
-        apartments: type === 'residential' ? floors * Math.floor(Math.random() * 4 + 2) : 0,
-        serviceLife: Math.floor(Math.random() * 40) + 15,
-        yearsToRepair: Math.floor(Math.random() * 10) + 1,
-      };
-    });
-
-    buildingRepository.saveAll(mockItems);
-    set({ items: mockItems });
   },
 }));

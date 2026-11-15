@@ -1,30 +1,64 @@
+import { useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { buildingSchema, type BuildingFormValues } from '../../../entities/building/model/schema.ts';
+import { createBuildingSchema, type BuildingFormValues } from '../../../entities/building/model/schema.ts';
+import { useBuildingStore } from '../../../entities/building/model/store.ts';
+import { isAddressTaken } from '../../../entities/building/lib/address.ts';
 import { BUILDING_TYPE_LABELS } from '../../../entities/building/lib/labels.ts';
 import type { Building } from '../../../entities/building/model/types.ts';
 import styles from './BuildingForm.module.scss';
 
+const DEFAULT_VALUES: BuildingFormValues = {
+  address: '',
+  type: 'residential',
+  floors: 1,
+  apartments: 0,
+  serviceLife: 30,
+  yearsToRepair: 5,
+};
+
 interface BuildingFormProps {
-  initialValues?: Building | null; // Если передано, то это режим редактирования
+  initialValues?: Building | null;
   onSubmit: (data: BuildingFormValues) => void;
+  onSubmitAndContinue?: (data: BuildingFormValues) => void;
   onCancel: () => void;
 }
 
-export const BuildingForm = ({ initialValues, onSubmit, onCancel }: BuildingFormProps) => {
+export const BuildingForm = ({
+                               initialValues,
+                               onSubmit,
+                               onSubmitAndContinue,
+                               onCancel,
+                             }: BuildingFormProps) => {
+  const items = useBuildingStore((state) => state.items);
+
+  const schema = useMemo(
+    () =>
+      createBuildingSchema((address) =>
+        isAddressTaken(items, address, initialValues?.id)
+      ),
+    [items, initialValues?.id]
+  );
+
   const {
     register,
     handleSubmit,
+    reset,
+    setFocus,
     formState: { errors },
   } = useForm<BuildingFormValues>({
-    resolver: zodResolver(buildingSchema),
-    defaultValues: initialValues || {
-      type: 'residential',
-      floors: 1,
-      apartments: 0,
-      serviceLife: 30,
-      yearsToRepair: 5,
-    },
+    resolver: zodResolver(schema),
+    defaultValues: initialValues || DEFAULT_VALUES,
+    mode: 'onBlur',
+  });
+
+  const [addedCount, setAddedCount] = useState(0);
+
+  const handleSaveAndContinue = handleSubmit((data) => {
+    onSubmitAndContinue?.(data);
+    setAddedCount((count) => count + 1);
+    reset(DEFAULT_VALUES);
+    setFocus('address');
   });
 
   return (
@@ -32,6 +66,10 @@ export const BuildingForm = ({ initialValues, onSubmit, onCancel }: BuildingForm
       <h3 className={styles.title}>
         {initialValues ? 'Редактирование здания' : 'Добавление нового здания'}
       </h3>
+
+      {addedCount > 0 && (
+        <p className={styles.counter}>Добавлено в этой сессии: {addedCount}</p>
+      )}
 
       <div className={styles.fieldGroup}>
         <label className={styles.label}>Адрес</label>
@@ -102,8 +140,15 @@ export const BuildingForm = ({ initialValues, onSubmit, onCancel }: BuildingForm
 
       <div className={styles.actions}>
         <button type="button" onClick={onCancel} className={styles.cancelBtn}>
-          Отмена
+          {addedCount > 0 ? 'Готово' : 'Отмена'}
         </button>
+
+        {!initialValues && onSubmitAndContinue && (
+          <button type="button" onClick={handleSaveAndContinue} className={styles.secondaryBtn}>
+            Сохранить и добавить ещё
+          </button>
+        )}
+
         <button type="submit" className={styles.submitBtn}>
           {initialValues ? 'Сохранить изменения' : 'Сохранить в базу'}
         </button>

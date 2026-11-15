@@ -16,7 +16,7 @@ function App() {
   const handleFormSubmit = (data: BuildingFormValues) => {
     if (formMode === 'create') {
       addBuilding(data);
-    } else if (typeof formMode === 'object' && formMode !== null) {
+    } else if (typeof formMode === 'object') {
       updateBuilding(formMode.id, data);
     }
     setFormMode('closed');
@@ -38,6 +38,7 @@ function App() {
           <BuildingForm
             initialValues={typeof formMode === 'object' ? formMode : null}
             onSubmit={handleFormSubmit}
+            onSubmitAndContinue={addBuilding}
             onCancel={() => setFormMode('closed')}
           />
         ) : (
