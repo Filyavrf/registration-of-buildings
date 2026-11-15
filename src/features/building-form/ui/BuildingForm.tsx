@@ -1,11 +1,11 @@
 import { useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { createBuildingSchema, type BuildingFormValues } from '../../../entities/building/model/schema.ts';
-import { useBuildingStore } from '../../../entities/building/model/store.ts';
-import { isAddressTaken } from '../../../entities/building/lib/address.ts';
-import { BUILDING_TYPE_LABELS } from '../../../entities/building/lib/labels.ts';
-import type { Building } from '../../../entities/building/model/types.ts';
+import { createBuildingSchema, type BuildingFormValues } from '@/entities/building/model/schema.ts';
+import { useBuildingStore } from '@/entities/building/model/store.ts';
+import { isAddressTaken } from '@/entities/building/lib/address.ts';
+import { BUILDING_TYPE_LABELS } from '@/entities/building/lib/labels.ts';
+import type { Building } from '@/entities/building/model/types.ts';
 import styles from './BuildingForm.module.scss';
 
 const DEFAULT_VALUES: BuildingFormValues = {

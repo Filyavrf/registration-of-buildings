@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { useBuildingStore } from '../../../entities/building/model/store.ts';
-import { BuildingRow } from '../../../entities/building/ui/BuildingRow.tsx';
-import { BUILDING_TYPE_LABELS } from '../../../entities/building/lib/labels.ts';
-import { ConfirmDialog } from '../../../shared/ui/ConfirmDialog/ConfirmDialog.tsx';
-import type { Building, BuildingType, SortKey } from '../../../entities/building/model/types.ts';
+import { useBuildingStore } from '@/entities/building/model/store.ts';
+import { BuildingRow } from '@/entities/building/ui/BuildingRow.tsx';
+import { BUILDING_TYPE_LABELS } from '@/entities/building/lib/labels.ts';
+import { ConfirmDialog } from '@/shared/ui/ConfirmDialog/ConfirmDialog.tsx';
+import type { Building, BuildingType, SortKey } from '@/entities/building/model/types.ts';
 import styles from './BuildingTableWidget.module.scss';
 
 interface BuildingTableWidgetProps {
