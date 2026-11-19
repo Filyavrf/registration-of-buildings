@@ -32,7 +32,6 @@ export const ConfirmDialog = ({
       <div
         className={styles.dialog}
         role="dialog"
-        aria-modal="true"
         onClick={(e) => e.stopPropagation()}
       >
         <p className={styles.message}>{message}</p>

@@ -28,9 +28,6 @@ function App() {
         <header className={styles.header}>
           <div>
             <h1 className={styles.title}>Учет зданий</h1>
-            <p className={styles.subtitle}>
-              Курсовая работа
-            </p>
           </div>
         </header>
 
