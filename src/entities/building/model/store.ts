@@ -1,12 +1,13 @@
 import { create } from 'zustand';
-import type { Building, BuildingDraft, SortKey, SortState, BuildingType } from './types.ts';
+import type { Building, BuildingDraft, SearchField, SortKey, SortState } from './types.ts';
 import { buildingRepository } from '../api/buildingRepository.ts';
 import { BUILDING_TYPE_LABELS } from '../lib/labels.ts';
+import { matchesSearch } from '../lib/search.ts';
 
 interface BuildingState {
   items: Building[];
   searchQuery: string;
-  filterType: BuildingType | 'all';
+  searchField: SearchField;
   sortState: SortState | null;
 
   add: (draft: BuildingDraft) => void;
@@ -15,7 +16,7 @@ interface BuildingState {
   removeMany: (ids: string[]) => void;
 
   setSearchQuery: (query: string) => void;
-  setFilterType: (type: BuildingType | 'all') => void;
+  setSearchField: (field: SearchField) => void;
   setSortState: (sort: SortState | null) => void;
 
   getFilteredAndSortedItems: () => Building[];
@@ -27,7 +28,7 @@ const getSortValue = (item: Building, key: SortKey): string | number =>
 export const useBuildingStore = create<BuildingState>()((set, get) => ({
   items: buildingRepository.getAll(),
   searchQuery: '',
-  filterType: 'all',
+  searchField: 'address',
   sortState: null,
 
   add: (draft) => {
@@ -61,17 +62,13 @@ export const useBuildingStore = create<BuildingState>()((set, get) => ({
   },
 
   setSearchQuery: (searchQuery) => set({ searchQuery }),
-  setFilterType: (filterType) => set({ filterType }),
+  setSearchField: (searchField) => set({ searchField }),
   setSortState: (sortState) => set({ sortState }),
 
   getFilteredAndSortedItems: () => {
-    const { items, searchQuery, filterType, sortState } = get();
+    const { items, searchQuery, searchField, sortState } = get();
 
-    let result = items.filter((item) => {
-      const matchesSearch = item.address.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesType = filterType === 'all' || item.type === filterType;
-      return matchesSearch && matchesType;
-    });
+    let result = items.filter((item) => matchesSearch(item, searchField, searchQuery));
 
     if (sortState) {
       const { key, dir } = sortState;

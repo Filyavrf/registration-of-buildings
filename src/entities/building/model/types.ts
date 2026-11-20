@@ -14,3 +14,4 @@ export interface Building {
 export type BuildingDraft = Omit<Building, 'id'>;
 export type SortKey = Exclude<keyof Building, 'id'>;
 export type SortState = { key: SortKey; dir: 'asc' | 'desc' };
+export type SearchField = Exclude<keyof Building, 'id'>;

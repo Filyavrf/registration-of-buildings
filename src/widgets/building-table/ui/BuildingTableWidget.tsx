@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { useBuildingStore } from '@/entities/building/model/store.ts';
-import { BuildingRow } from '@/entities/building/ui/BuildingRow.tsx';
-import { BUILDING_TYPE_LABELS } from '@/entities/building/lib/labels.ts';
-import { ConfirmDialog } from '@/shared/ui/ConfirmDialog/ConfirmDialog.tsx';
-import type { Building, BuildingType, SortKey } from '@/entities/building/model/types.ts';
+import { useBuildingStore } from '../../../entities/building/model/store.ts';
+import { BuildingRow } from '../../../entities/building/ui/BuildingRow.tsx';
+import { FIELD_LABELS } from '../../../entities/building/lib/labels.ts';
+import { ConfirmDialog } from '../../../shared/ui/ConfirmDialog/ConfirmDialog.tsx';
+import type { Building, SearchField, SortKey } from '../../../entities/building/model/types.ts';
 import styles from './BuildingTableWidget.module.scss';
 
 interface BuildingTableWidgetProps {
@@ -20,8 +20,8 @@ export const BuildingTableWidget = ({ onAddClick, onEditClick }: BuildingTableWi
   const {
     searchQuery,
     setSearchQuery,
-    filterType,
-    setFilterType,
+    searchField,
+    setSearchField,
     sortState,
     setSortState,
     remove,
@@ -38,8 +38,8 @@ export const BuildingTableWidget = ({ onAddClick, onEditClick }: BuildingTableWi
     setSelectedIds([]);
   };
 
-  const handleFilterChange = (value: BuildingType | 'all') => {
-    setFilterType(value);
+  const handleFieldChange = (value: SearchField) => {
+    setSearchField(value);
     setSelectedIds([]);
   };
 
@@ -100,26 +100,25 @@ export const BuildingTableWidget = ({ onAddClick, onEditClick }: BuildingTableWi
     <div className={styles.container}>
       <div className={styles.controls}>
         <div className={styles.filters}>
-          <input
-            type="text"
-            placeholder="Поиск по адресу..."
-            value={searchQuery}
-            onChange={(e) => handleSearchChange(e.target.value)}
-            className={styles.searchInput}
-          />
-
           <select
-            value={filterType}
-            onChange={(e) => handleFilterChange(e.target.value as BuildingType | 'all')}
+            value={searchField}
+            onChange={(e) => handleFieldChange(e.target.value as SearchField)}
             className={styles.selectFilter}
           >
-            <option value="all">Все типы зданий</option>
-            {Object.entries(BUILDING_TYPE_LABELS).map(([key, label]) => (
+            {Object.entries(FIELD_LABELS).map(([key, label]) => (
               <option key={key} value={key}>
                 {label}
               </option>
             ))}
           </select>
+
+          <input
+            type="text"
+            placeholder={`Поиск по полю «${FIELD_LABELS[searchField]}»...`}
+            value={searchQuery}
+            onChange={(e) => handleSearchChange(e.target.value)}
+            className={styles.searchInput}
+          />
         </div>
 
         <div className={styles.actions}>

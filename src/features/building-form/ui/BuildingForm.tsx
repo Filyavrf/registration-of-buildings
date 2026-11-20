@@ -1,11 +1,12 @@
 import { useMemo, useState } from 'react';
+import type { ClipboardEvent, KeyboardEvent } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { createBuildingSchema, type BuildingFormValues } from '@/entities/building/model/schema.ts';
-import { useBuildingStore } from '@/entities/building/model/store.ts';
-import { isAddressTaken } from '@/entities/building/lib/address.ts';
-import { BUILDING_TYPE_LABELS } from '@/entities/building/lib/labels.ts';
-import type { Building } from '@/entities/building/model/types.ts';
+import { createBuildingSchema, type BuildingFormValues } from '../../../entities/building/model/schema.ts';
+import { useBuildingStore } from '../../../entities/building/model/store.ts';
+import { isAddressTaken } from '../../../entities/building/lib/address.ts';
+import { BUILDING_TYPE_LABELS } from '../../../entities/building/lib/labels.ts';
+import type { Building } from '../../../entities/building/model/types.ts';
 import styles from './BuildingForm.module.scss';
 
 const DEFAULT_VALUES: BuildingFormValues = {
@@ -15,6 +16,14 @@ const DEFAULT_VALUES: BuildingFormValues = {
   apartments: 0,
   serviceLife: 30,
   yearsToRepair: 5,
+};
+
+const blockInvalidKeys = (e: KeyboardEvent<HTMLInputElement>) => {
+  if (['-', '+', 'e', 'E', '.', ','].includes(e.key)) e.preventDefault();
+};
+
+const blockInvalidPaste = (e: ClipboardEvent<HTMLInputElement>) => {
+  if (!/^\d+$/.test(e.clipboardData.getData('text').trim())) e.preventDefault();
 };
 
 interface BuildingFormProps {
@@ -62,7 +71,7 @@ export const BuildingForm = ({
   });
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
+    <form onSubmit={handleSubmit(onSubmit)} className={styles.form} noValidate>
       <h3 className={styles.title}>
         {initialValues ? 'Редактирование здания' : 'Добавление нового здания'}
       </h3>
@@ -75,6 +84,7 @@ export const BuildingForm = ({
         <label className={styles.label}>Адрес</label>
         <input
           type="text"
+          maxLength={100}
           {...register('address')}
           className={styles.input}
           placeholder="Например: ул. Ленина, 10"
@@ -99,6 +109,11 @@ export const BuildingForm = ({
           <label className={styles.label}>Количество этажей</label>
           <input
             type="number"
+            min={1}
+            max={200}
+            step={1}
+            onKeyDown={blockInvalidKeys}
+            onPaste={blockInvalidPaste}
             {...register('floors', { valueAsNumber: true })}
             className={styles.input}
           />
@@ -109,6 +124,11 @@ export const BuildingForm = ({
           <label className={styles.label}>Количество квартир</label>
           <input
             type="number"
+            min={0}
+            max={5000}
+            step={1}
+            onKeyDown={blockInvalidKeys}
+            onPaste={blockInvalidPaste}
             {...register('apartments', { valueAsNumber: true })}
             className={styles.input}
           />
@@ -118,9 +138,14 @@ export const BuildingForm = ({
 
       <div className={styles.rowGroup}>
         <div className={styles.fieldGroup}>
-          <label className={styles.label}>Срок эксплуатации (лет)</label>
+          <label className={styles.label}>Срок эксплуатации, лет</label>
           <input
             type="number"
+            min={1}
+            max={500}
+            step={1}
+            onKeyDown={blockInvalidKeys}
+            onPaste={blockInvalidPaste}
             {...register('serviceLife', { valueAsNumber: true })}
             className={styles.input}
           />
@@ -128,9 +153,14 @@ export const BuildingForm = ({
         </div>
 
         <div className={styles.fieldGroup}>
-          <label className={styles.label}>Срок до кап. ремонта (лет)</label>
+          <label className={styles.label}>Срок до кап. ремонта, лет</label>
           <input
             type="number"
+            min={0}
+            max={100}
+            step={1}
+            onKeyDown={blockInvalidKeys}
+            onPaste={blockInvalidPaste}
             {...register('yearsToRepair', { valueAsNumber: true })}
             className={styles.input}
           />
